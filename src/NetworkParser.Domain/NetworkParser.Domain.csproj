@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="PacketDotNet" />
     <PackageReference Include="SharpPcap" />
-    <PackageReference Include="SharpPcap.Core" />
   </ItemGroup>
 
 </Project>

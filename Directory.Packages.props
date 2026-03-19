@@ -12,5 +12,6 @@
     <PackageVersion Include="SharpPcap" Version="6.3.1" />
     <PackageVersion Include="SharpPcap.Core" Version="1.0.0" />
     <PackageVersion Include="Uno.CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.205" />
+    <PackageVersion Include="Uno.Toolkit.WinUI" Version="8.4.2" />
   </ItemGroup>
 </Project>

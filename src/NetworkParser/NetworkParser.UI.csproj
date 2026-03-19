@@ -1,4 +1,4 @@
-<Project Sdk="Uno.Sdk">
+﻿<Project Sdk="Uno.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0-android;net10.0-ios;net10.0-browserwasm;net10.0-desktop</TargetFrameworks>
 
@@ -33,8 +33,8 @@
   <ItemGroup>
     <PackageReference Include="PacketDotNet" />
     <PackageReference Include="SharpPcap" />
-    <PackageReference Include="SharpPcap.Core" />
     <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Controls.DataGrid" />
+    <PackageReference Include="Uno.Toolkit.WinUI" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NetworkParser.Core.Abstractions\NetworkParser.Core.Abstractions.csproj" />

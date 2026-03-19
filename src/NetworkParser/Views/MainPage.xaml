@@ -19,34 +19,14 @@
         </Grid.RowDefinitions>
 
         <!-- TOP BAR -->
-        <CommandBar Grid.Row="0">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Background="{ThemeResource CommandBarBackground}">
+            <Button Content="Start" Command="{Binding StartCaptureCommand}" />
+            <Button Content="Stop"  Command="{Binding StopCaptureCommand}" />
+            <Button Content="Interfaces" Command="{Binding OpenInterfacesCommand}" />
 
-            <AppBarButton Label="Start"
-                   Command="{Binding StartCaptureCommand}" />
-
-            <AppBarButton Label="Stop"
-                   Command="{Binding StopCaptureCommand}" />
-
-            <AppBarButton Label="Interfaces"
-                   Command="{Binding OpenInterfacesCommand}" />
-
-            <CommandBar.Content>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-
-                    <TextBox Width="300"
-              PlaceholderText="Filter"
-              Text="{Binding FilterText, Mode=TwoWay}" />
-
-                    <Button Content="Apply"
-             Command="{Binding ApplyFilterCommand}" />
-                    <AppBarButton Label="Apply"
-                 Command="{Binding ApplyFilterCommand}" />
-                </StackPanel>
-            </CommandBar.Content>
-
-
-
-        </CommandBar>
+            <TextBox Width="300" PlaceholderText="Filter" Text="{Binding FilterText, Mode=TwoWay}" />
+            <Button Content="Apply" Command="{Binding ApplyFilterCommand}" />
+        </StackPanel>
 
         <!-- PACKET LIST -->
         <controls:PacketListView Grid.Row="1"/>
@@ -56,6 +36,5 @@
 
         <!-- HEX -->
         <controls:HexViewerView Grid.Row="3"/>
-        
     </Grid>
 </Page>

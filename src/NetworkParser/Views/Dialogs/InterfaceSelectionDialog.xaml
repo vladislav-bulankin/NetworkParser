@@ -3,13 +3,34 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:NetworkParser.Views.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="TITLE"
-    Style="{ThemeResource DefaultContentDialogStyle}"
-    PrimaryButtonText="Button1"
-    SecondaryButtonText="Button2"
+    mc:Ignorable="d"
+    
+    Title="Select Network Interface"
+    PrimaryButtonText="Start Capture"
+    SecondaryButtonText="Cancel"
+    CloseButtonText="Close"
+    
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
-	<Grid>
-	</Grid>
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    
+    DefaultButton="Primary">
+
+    <Grid Margin="0,12,0,0">
+        <StackPanel Spacing="12">
+            <TextBlock Text="Available network interfaces:" />
+
+            <ComboBox 
+                ItemsSource="{Binding NetworkInterfaces}"
+                SelectedItem="{Binding SelectedInterface, Mode=TwoWay}"
+                DisplayMemberPath="FriendlyName"   
+                PlaceholderText="Select interface..."
+                HorizontalAlignment="Stretch"
+                MinWidth="300" />
+
+                <TextBlock Text="{Binding SelectedInterface.FriendlyName, FallbackValue='No interface selected'}" 
+                       FontWeight="SemiBold" />
+        </StackPanel>
+    </Grid>
 </ContentDialog>

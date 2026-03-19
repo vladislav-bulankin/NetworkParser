@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using NetworkParser.ViewModels;
 
 namespace NetworkParser.Views.Dialogs;
 
 public sealed partial class InterfaceSelectionDialog : ContentDialog {
-    public InterfaceSelectionDialog () {
+    private readonly MainViewModel viewModel;
+
+    public InterfaceSelectionDialog (MainViewModel viewModel) {
         this.InitializeComponent();
+        this.viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+
+        DataContext = this.viewModel;  
     }
 
     private void ContentDialog_PrimaryButtonClick (ContentDialog sender, ContentDialogButtonClickEventArgs args) {
+        viewModel.StartSniffing(); 
     }
 
     private void ContentDialog_SecondaryButtonClick (ContentDialog sender, ContentDialogButtonClickEventArgs args) {
+        // Cancel — ничего не делаем
     }
 }
