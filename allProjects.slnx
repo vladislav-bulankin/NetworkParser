@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+  </Folder>
+  <Project Path="src/NetworkParser.Core.Abstractions/NetworkParser.Core.Abstractions.csproj" Id="43ce306f-10fb-4a33-a817-e1c5d62ed86c" />
+  <Project Path="src/NetworkParser.Core/NetworkParser.Core.csproj" Id="121747b9-5ac3-40d7-acf6-9b26ae78e3ff" />
+  <Project Path="src/NetworkParser.Domain/NetworkParser.Domain.csproj" Id="13ed6c62-1886-4f39-b614-750beaa7b562" />
+  <Project Path="src/NetworkParser/NetworkParser.UI.csproj">
+    <Deploy />
+  </Project>
+</Solution>

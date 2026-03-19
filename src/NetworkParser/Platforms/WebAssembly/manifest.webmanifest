@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "NetworkParser",
+  "display": "standalone",
+  "name": "NetworkParser",
+  "short_name": "NetworkParser",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

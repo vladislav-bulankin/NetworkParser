@@ -1,0 +1,31 @@
+﻿<UserControl
+    x:Class="NetworkParser.Views.Controls.PacketListView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NetworkParser.Views.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+        <controls:DataGrid
+            ItemsSource="{Binding Packets}"
+            SelectedItem="{Binding SelectedPacket, Mode=TwoWay}"
+            AutoGenerateColumns="False"
+        >
+
+            <controls:DataGrid.Columns>
+                <controls:DataGridTextColumn Header="#" Binding="{Binding Number}" Width="60"/>
+                <controls:DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="200"/>
+                <controls:DataGridTextColumn Header="Destination" Binding="{Binding Destination}" Width="200"/>
+                <controls:DataGridTextColumn Header="Protocol" Binding="{Binding Protocol}" Width="120"/>
+                <controls:DataGridTextColumn Header="Length" Binding="{Binding Length}" Width="80"/>
+                <controls:DataGridTextColumn Header="Info" Binding="{Binding Info}" Width="*"/>
+            </controls:DataGrid.Columns>
+
+        </controls:DataGrid>
+    </Grid>
+</UserControl>
