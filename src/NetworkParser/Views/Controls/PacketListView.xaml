@@ -13,7 +13,7 @@
     <Grid DataContext="{Binding PacketListVM}">
         <toolkit:DataGrid
             x:Name="PacketsDataGrid"
-            ItemsSource="{Binding Packets, Mode=OneWay}"
+            ItemsSource="{Binding FilteredPackets, Mode=OneWay}"
             SelectedItem="{Binding SelectedPacket, Mode=TwoWay}"
             AutoGenerateColumns="False"
             IsReadOnly="True"

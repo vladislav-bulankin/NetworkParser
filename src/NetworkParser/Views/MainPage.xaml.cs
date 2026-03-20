@@ -16,17 +16,13 @@ public sealed partial class MainPage : Page {
         viewModel.InitializeDispatcher(this.DispatcherQueue);
         DataContext = viewModel;
         if (viewModel != null) {
-            viewModel.InterfaceSelectionRequested += async () => await ShowInterfaceDialogAsync(viewModel);
+            viewModel.InterfaceSelectionRequested += async () =>
+                await ShowInterfaceDialogAsync(viewModel);
         }
     }
     private async Task ShowInterfaceDialogAsync (MainViewModel vm) {
         var dialog = new InterfaceSelectionDialog(vm);
         dialog.XamlRoot = this.XamlRoot;
-
-        var result = await dialog.ShowAsync();
-
-        if (result == ContentDialogResult.Primary) {
-            vm.StartSniffing();
-        }
+        await dialog.ShowAsync();
     }
 }

@@ -7,15 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     
-    Title="Select Network Interface"
-    PrimaryButtonText="Start Capture"
-    SecondaryButtonText="Cancel"
-    CloseButtonText="Close"
-    
-    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
-    
-    DefaultButton="Primary">
+    Title="Select Network Interface">
 
     <Grid Margin="0,12,0,0">
         <StackPanel Spacing="12">
@@ -27,7 +19,8 @@
                 DisplayMemberPath="FriendlyName"   
                 PlaceholderText="Select interface..."
                 HorizontalAlignment="Stretch"
-                MinWidth="300" />
+                MinWidth="300"
+                SelectionChanged="OnInterfaceSelected"/>
 
                 <TextBlock Text="{Binding SelectedInterface.FriendlyName, FallbackValue='No interface selected'}" 
                        FontWeight="SemiBold" />

@@ -2,34 +2,55 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Microsoft.UI.Dispatching;
 using NetworkParser.Core.Abstractions.Connection;
+using NetworkParser.Core.Helpers;
 using NetworkParser.Domain.Interfaces;
 using NetworkParser.Domain.Packets;
 
 namespace NetworkParser.ViewModels;
 
-public class MainViewModel {
+public class MainViewModel : INotifyPropertyChanged {
     private readonly INetworkParserController controller;
     public ObservableCollection<NetworkInterfaceModel> NetworkInterfaces { get; } = new();
     public event PropertyChangedEventHandler? PropertyChanged;
     public PacketListViewModel PacketListVM { get; }
     public PacketDetailsViewModel PacketDetailsVM { get; }
     public HexViewerViewModel HexViewerVM { get; }
-
+    
     private string filterText;
+    private Func<PacketModel, bool> currentFilter = _ => true;
     public string FilterText
     {
         get => filterText;
-        set { filterText = value; OnPropertyChanged(); }
+        set {
+            filterText = value;
+            OnPropertyChanged();
+
+            currentFilter = PacketFilterBuilder.Build(filterText);
+            PacketListVM.SetFilter(currentFilter);
+        }
     }
     private NetworkInterfaceModel? selectedInterface;
     public NetworkInterfaceModel? SelectedInterface
     {
         get => selectedInterface;
         set {
+            if (selectedInterface == value){
+                return;
+            }
             selectedInterface = value;
             OnPropertyChanged();
+            if (selectedInterface != null) {
+                OnPropertyChanged(nameof(CurrentInterfaceDisplay));
+                StartSniffing();
+            }
         }
     }
+    public string CurrentInterfaceDisplay=>
+            SelectedInterface == null
+                    ? "No interface selected"
+                    : $"Listening on: {SelectedInterface.FriendlyName}";
+    
+    public string CaptureFilter { get; set; }
     public RelayCommand StartCaptureCommand { get; }
     public RelayCommand StopCaptureCommand { get; }
     public RelayCommand ApplyFilterCommand { get; }
@@ -49,10 +70,17 @@ public class MainViewModel {
         OpenInterfacesCommand = new RelayCommand(() => GetInterfaces());
         StartCaptureCommand = new RelayCommand(() => StartSniffing());
         StopCaptureCommand = new RelayCommand(() => controller.StopCapture());
-        ApplyFilterCommand = new RelayCommand(() => controller.ApplyFilter(FilterText));
+        ApplyFilterCommand = new RelayCommand(() =>
+        {
+            controller.ApplyFilter(CaptureFilter);
+            PacketListVM.SetFilter(PacketFilterBuilder.Build(FilterText));
+        });
     }
     public void StartSniffing () {
-        controller.StartCapture(SelectedInterface?.Index ?? 4, FilterText);
+        if (SelectedInterface == null){ return; }
+        PacketListVM.Clear();
+        controller.StopCapture();
+        controller.StartCapture(SelectedInterface.Index, CaptureFilter);
     }
     public void InitializeDispatcher (DispatcherQueue dispatcher) {
         PacketListVM.SetDispatcher(dispatcher);

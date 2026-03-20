@@ -10,10 +10,15 @@ public class PacketListViewModel : INotifyPropertyChanged {
     private readonly INetworkParserController controller;
     private DispatcherQueue dispatcher;
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    public ObservableCollection<PacketModel> Packets { get; } = new();
-
+    public ObservableCollection<PacketModel> AllPackets { get; } = new();
+    public ObservableCollection<PacketModel> FilteredPackets { get; } = new();
+    const int MaxPackets = 5000;
     private PacketModel? selectedPacket;
+    private Func<PacketModel, bool> currentFilter = _ => true;
+    public void SetFilter (Func<PacketModel, bool> filter) {
+        currentFilter = filter ?? (_ => true);
+        ApplyFilter();
+    }
     public PacketModel? SelectedPacket
     {
         get => selectedPacket;
@@ -25,18 +30,27 @@ public class PacketListViewModel : INotifyPropertyChanged {
     }
 
     public event Action<PacketModel>? PacketSelected;
-
+    public void Clear () {
+        FilteredPackets.Clear();
+        AllPackets.Clear();
+    }
     public PacketListViewModel (INetworkParserController controller) {
         this.controller = controller ?? throw new ArgumentNullException(nameof(controller));
-        
         this.controller.PacketCaptured += OnPacketCaptured;
     }
 
     private void OnPacketCaptured (PacketModel packet) {
         dispatcher.TryEnqueue(() =>
         {
-            packet.Number = Packets.Count + 1;
-            Packets.Add(packet);
+            if (AllPackets.Count > MaxPackets) {
+                AllPackets.RemoveAt(0);
+                FilteredPackets.RemoveAt(0);
+            }
+            packet.Number = AllPackets.Count + 1;
+            AllPackets.Add(packet);
+            if (currentFilter(packet)) {
+                FilteredPackets.Add(packet);
+            }
         });
     }
 
@@ -51,5 +65,13 @@ public class PacketListViewModel : INotifyPropertyChanged {
 
     internal void SetDispatcher (DispatcherQueue dispatcher) {
         this.dispatcher = dispatcher;
+    }
+    public void ApplyFilter () {
+        this.Clear();
+        foreach (var packet in AllPackets) {
+            if (currentFilter(packet)) {
+                FilteredPackets.Add(packet);
+            }
+        }
     }
 }

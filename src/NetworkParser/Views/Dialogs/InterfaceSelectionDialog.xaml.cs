@@ -4,19 +4,16 @@ namespace NetworkParser.Views.Dialogs;
 
 public sealed partial class InterfaceSelectionDialog : ContentDialog {
     private readonly MainViewModel viewModel;
-
+    private bool isLoaded = false;
     public InterfaceSelectionDialog (MainViewModel viewModel) {
         this.InitializeComponent();
         this.viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
-
-        DataContext = this.viewModel;  
+        DataContext = this.viewModel;
+        Loaded += (_, _) => isLoaded = true;
     }
-
-    private void ContentDialog_PrimaryButtonClick (ContentDialog sender, ContentDialogButtonClickEventArgs args) {
-        viewModel.StartSniffing(); 
-    }
-
-    private void ContentDialog_SecondaryButtonClick (ContentDialog sender, ContentDialogButtonClickEventArgs args) {
-        // Cancel — ничего не делаем
+    private void OnInterfaceSelected (object sender, SelectionChangedEventArgs e) {
+        if (isLoaded && e.AddedItems.Count > 0) {
+            Hide();
+        }
     }
 }

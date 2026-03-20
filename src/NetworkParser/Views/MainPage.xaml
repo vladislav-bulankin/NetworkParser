@@ -17,15 +17,18 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
-
         <!-- TOP BAR -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Background="{ThemeResource CommandBarBackground}">
             <Button Content="Start" Command="{Binding StartCaptureCommand}" />
             <Button Content="Stop"  Command="{Binding StopCaptureCommand}" />
             <Button Content="Interfaces" Command="{Binding OpenInterfacesCommand}" />
-
-            <TextBox Width="300" PlaceholderText="Filter" Text="{Binding FilterText, Mode=TwoWay}" />
-            <Button Content="Apply" Command="{Binding ApplyFilterCommand}" />
+            <TextBox
+                PlaceholderText="Filter (e.g. tcp, 192.168, http)"
+                Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="8"/>
+            <TextBlock
+                Text="{Binding CurrentInterfaceDisplay}"
+                Margin="15"/>
         </StackPanel>
 
         <!-- PACKET LIST -->

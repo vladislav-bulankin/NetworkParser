@@ -52,14 +52,11 @@ public class NetworkParserController : INetworkParserController {
     /// <param name="bpfFilter"></param>
     /// <exception cref="ArgumentException"></exception>
     public void StartCapture (int deviceIndex = 0, string? bpfFilter = null) {
-        System.Diagnostics.Debug.WriteLine("START CAPTURE CALLED");
         if (device != null){ StopCapture(); }
         var devices = LibPcapLiveDeviceList.Instance;
         if (deviceIndex < 0 || deviceIndex >= devices.Count){
             throw new ArgumentException("Неверный индекс сетевого устройства");
         }
-        System.Diagnostics.Debug.WriteLine($"DEVICES COUNT: {devices.Count}");
-
         for (int i = 0; i < devices.Count; i++) {
             System.Diagnostics.Debug.WriteLine($"{i}: {devices[i].Description}");
         }
@@ -70,7 +67,6 @@ public class NetworkParserController : INetworkParserController {
             device.Filter = bpfFilter;
         }
         device.StartCapture();
-        System.Diagnostics.Debug.WriteLine($"DEVICE STARTED: {device.Description}");
         packetCounter = 0;
     }
 
