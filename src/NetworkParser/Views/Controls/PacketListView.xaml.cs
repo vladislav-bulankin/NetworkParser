@@ -1,6 +1,10 @@
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
+using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI;
 using Microsoft.UI.Xaml.Input;
+using NetworkParser.Domain.Packets;
+using NetworkParser.UI.Views.Converters;
 using NetworkParser.ViewModels;
 
 namespace NetworkParser.Views.Controls;
@@ -13,6 +17,17 @@ public sealed partial class PacketListView : UserControl {
     private void OnRowDoubleTapped (object sender, DoubleTappedRoutedEventArgs e) {
         if (DataContext is MainViewModel mainVM) {
             mainVM.PacketListVM.TriggerPacketSelected();
+        }
+    }
+
+    private void OnLoadingRow (object sender, DataGridRowEventArgs e) {
+        if (e.Row.DataContext is PacketModel packet) {
+            var converter = new ProtocolColorConverter();
+            var brush = (SolidColorBrush)converter.Convert(
+                packet.Protocol, typeof(SolidColorBrush), null, null);
+
+            e.Row.Background = brush;
+            e.Row.Foreground = new SolidColorBrush(Colors.White);
         }
     }
 

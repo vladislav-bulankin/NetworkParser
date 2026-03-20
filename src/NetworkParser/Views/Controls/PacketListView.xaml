@@ -18,7 +18,9 @@
             AutoGenerateColumns="False"
             IsReadOnly="True"
             GridLinesVisibility="All"
-            AlternatingRowBackground="{ThemeResource SystemAltHighColor}"
+            RowBackground="Transparent"
+            AlternatingRowBackground="Transparent"
+            LoadingRow="OnLoadingRow"
             Height="Auto"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch"
@@ -30,6 +32,11 @@
                     Binding="{Binding Number}" 
                     Width="60" 
                     IsReadOnly="True"/>
+
+                <toolkit:DataGridTextColumn
+                    Header="Time"
+                    Binding="{Binding Timestamp, Converter={StaticResource TimestampConverter}}"
+                    Width="100"/>
 
                 <toolkit:DataGridTextColumn 
                     Header="Source" 

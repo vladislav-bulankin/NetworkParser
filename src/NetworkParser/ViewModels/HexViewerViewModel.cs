@@ -21,8 +21,9 @@ public class HexViewerViewModel : INotifyPropertyChanged {
         var sb = new StringBuilder();
 
         for (int i = 0; i < packet.RawData.Length; i++) {
-            if (i % 16 == 0)
+            if (i % 16 == 0) {
                 sb.AppendLine();
+            }
 
             sb.Append(packet.RawData[i].ToString("X2") + " ");
         }

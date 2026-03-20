@@ -114,18 +114,16 @@ public class NetworkParserController : INetworkParserController {
         return "Unknown";
     }
     private void Device_OnPacketArrival (object sender, PacketCapture e) {
-        System.Diagnostics.Debug.WriteLine("PACKET ARRIVED");
         var rawPacket = e.GetPacket();
         var parsed = Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
+
         var model = new PacketModel {
             Number = ++packetCounter,
-            Timestamp = DateTime.UtcNow,
+            Timestamp = DateTime.Now,
             Length = rawPacket.Data.Length,
             RawData = rawPacket.Data.ToArray(),
-            Info = parsed.ToString() 
         };
 
-        // Заполняем основные поля
         if (parsed is EthernetPacket eth) {
             model.Source = eth.SourceHardwareAddress?.ToString() ?? "N/A";
             model.Destination = eth.DestinationHardwareAddress?.ToString() ?? "N/A";
@@ -134,11 +132,64 @@ public class NetworkParserController : INetworkParserController {
             if (eth.PayloadPacket is IPPacket ip) {
                 model.Source = ip.SourceAddress.ToString();
                 model.Destination = ip.DestinationAddress.ToString();
-                model.Protocol = ip.Protocol.ToString();
+
+                if (ip.PayloadPacket is TcpPacket tcp) {
+                    model.Protocol = "Tcp";
+                    model.Info = BuildTcpInfo(tcp);
+                } else if (ip.PayloadPacket is UdpPacket udp) {
+                    model.Protocol = "Udp";
+                    model.Info = BuildUdpInfo(udp);
+                } else if (ip.PayloadPacket is IcmpV4Packet icmp) {
+                    model.Protocol = "Icmp";
+                    model.Info = $"Type={icmp.TypeCode}";
+                } else {
+                    model.Protocol = ip.Protocol.ToString();
+                    model.Info = $"IP {ip.SourceAddress} → {ip.DestinationAddress}";
+                }
+            } else if (eth.PayloadPacket is ArpPacket arp) {
+                model.Protocol = "Arp";
+                model.Info = BuildArpInfo(arp);
+            } else {
+                model.Info = $"Ethernet Type={eth.Type}";
             }
+        } else {
+            model.Protocol = "Unknown";
+            model.Info = parsed?.ToString() ?? "N/A";
         }
 
         packets.Add(model);
         PacketCaptured?.Invoke(model);
     }
+
+    private static string BuildTcpInfo (TcpPacket tcp) {
+        var flags = new List<string>();
+        if (tcp.Synchronize){
+            flags.Add("SYN");
+        }
+        if (tcp.Acknowledgment){
+            flags.Add("ACK");
+        }
+        if (tcp.Finished){
+            flags.Add("FIN");
+        }
+        if (tcp.Reset){
+            flags.Add("RST");
+        }
+        if (tcp.Push){
+            flags.Add("PSH");
+        }
+
+        var flagStr = flags.Count > 0 ? string.Join(", ", flags) : "—";
+        return $"{tcp.SourcePort} → " +
+            $"{tcp.DestinationPort} [{flagStr}]" +
+            $" Seq={tcp.SequenceNumber} Win={tcp.WindowSize}";
+    }
+
+    private static string BuildUdpInfo (UdpPacket udp) =>
+        $"{udp.SourcePort} → {udp.DestinationPort} Len={udp.Length}";
+
+    private static string BuildArpInfo (ArpPacket arp) =>
+        arp.Operation == ArpOperation.Request
+            ? $"Who has {arp.TargetProtocolAddress}? Tell {arp.SenderProtocolAddress}"
+            : $"{arp.SenderProtocolAddress} is at {arp.SenderHardwareAddress}";
 }
