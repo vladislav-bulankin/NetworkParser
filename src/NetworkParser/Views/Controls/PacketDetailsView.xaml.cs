@@ -1,24 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using NetworkParser.Domain.Protocols;
+using NetworkParser.ViewModels;
 
 namespace NetworkParser.Views.Controls;
 
 public sealed partial class PacketDetailsView : UserControl {
+    private MainViewModel? currentVM;
     public PacketDetailsView () {
         this.InitializeComponent();
+        DataContextChanged += OnDataContextChanged;
+    }
+    private void OnDataContextChanged (FrameworkElement sender, DataContextChangedEventArgs args) {
+        if (currentVM != null){
+            currentVM.PacketDetailsVM.ProtocolTree.CollectionChanged -= OnTreeChanged;
+        }
+
+        if (DataContext is MainViewModel mainVM) {
+            currentVM = mainVM;
+            currentVM.PacketDetailsVM.ProtocolTree.CollectionChanged += OnTreeChanged;
+            RebuildTree(currentVM.PacketDetailsVM.ProtocolTree);
+        }
+    }
+
+    private void OnTreeChanged (object? sender, NotifyCollectionChangedEventArgs e) {
+        if (currentVM != null)
+            RebuildTree(currentVM.PacketDetailsVM.ProtocolTree);
+    }
+
+    private void RebuildTree (ObservableCollection<ProtocolModel> items) {
+        ProtocolTreeView.RootNodes.Clear();
+
+        foreach (var item in items) {
+            var node = new TreeViewNode { Content = item.DisplayText, IsExpanded = true };
+            foreach (var child in item.Children)
+                node.Children.Add(new TreeViewNode { Content = child.DisplayText });
+            ProtocolTreeView.RootNodes.Add(node);
+        }
     }
 }

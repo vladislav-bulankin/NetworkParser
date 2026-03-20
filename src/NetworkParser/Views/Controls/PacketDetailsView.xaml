@@ -9,11 +9,11 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid>
-        <TreeView ItemsSource="{Binding ProtocolTree}">
+    <Grid DataContext="{Binding PacketDetailsVM}">
+        <TreeView x:Name="ProtocolTreeView">
             <TreeView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding DisplayText}" />
+                    <TextBlock Text="{Binding Content}" />
                 </DataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

@@ -21,7 +21,8 @@
             AlternatingRowBackground="{ThemeResource SystemAltHighColor}"
             Height="Auto"
             VerticalAlignment="Stretch"
-            HorizontalAlignment="Stretch">
+            HorizontalAlignment="Stretch"
+            DoubleTapped="OnRowDoubleTapped">
 
             <toolkit:DataGrid.Columns>
                 <toolkit:DataGridTextColumn 

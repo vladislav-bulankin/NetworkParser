@@ -4,7 +4,7 @@ using NetworkParser.Domain.Packets;
 
 namespace NetworkParser.ViewModels;
 
-public class HexViewerViewModel {
+public class HexViewerViewModel : INotifyPropertyChanged {
     private string hexDump;
     public string HexDump
     {

@@ -25,7 +25,12 @@ public class PacketListViewModel : INotifyPropertyChanged {
         set {
             selectedPacket = value;
             OnPropertyChanged();
-            PacketSelected?.Invoke(value!);
+        }
+    }
+
+    public void TriggerPacketSelected() {
+        if (selectedPacket != null){
+            PacketSelected?.Invoke(selectedPacket);
         }
     }
 
