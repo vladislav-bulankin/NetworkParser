@@ -55,7 +55,8 @@ public class MainViewModel : INotifyPropertyChanged {
     public RelayCommand StopCaptureCommand { get; }
     public RelayCommand ApplyFilterCommand { get; }
     public RelayCommand OpenInterfacesCommand { get; }
-
+    public RelayCommand SaveCaptureCommand { get; }
+    public RelayCommand OpenCaptureCommand { get; }
     public MainViewModel (
             INetworkParserController controller,
             PacketListViewModel listVM,
@@ -75,6 +76,24 @@ public class MainViewModel : INotifyPropertyChanged {
             controller.ApplyFilter(CaptureFilter);
             PacketListVM.SetFilter(PacketFilterBuilder.Build(FilterText));
         });
+        SaveCaptureCommand = new RelayCommand(() => SaveCaptureRequested?.Invoke());
+        OpenCaptureCommand = new RelayCommand(() => OpenCaptureRequested?.Invoke());
+    }
+
+    public event Action? SaveCaptureRequested;
+    public event Action? OpenCaptureRequested;
+
+    public void SaveCapture (string filePath) {
+        controller.SaveCapture(filePath);
+    }
+
+    public void LoadCapture (string filePath) {
+        controller.StopCapture();
+        PacketListVM.Clear();
+        var loaded = controller.LoadCapture(filePath);
+        foreach (var p in loaded){
+            PacketListVM.AddPacket(p);
+        }
     }
     public void StartSniffing () {
         if (SelectedInterface == null){ return; }

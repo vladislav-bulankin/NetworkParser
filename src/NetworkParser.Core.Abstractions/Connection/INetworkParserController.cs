@@ -12,4 +12,6 @@ public interface INetworkParserController {
     List<NetworkInterfaceModel> GetAvailableInterfaces ();
     void StartCapture (int deviceIndex = 0, string? bpfFilter = null);
     void SendPacket (byte[] rawData);
+    void SaveCapture (string filePath);
+    List<PacketModel> LoadCapture (string filePath);
 }

@@ -20,6 +20,8 @@
         </Grid.RowDefinitions>
         <!-- TOP BAR -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Background="{ThemeResource CommandBarBackground}">
+            <Button Content="Save" Command="{Binding SaveCaptureCommand}" />
+            <Button Content="Open" Command="{Binding OpenCaptureCommand}" />
             <Button Content="Start" Command="{Binding StartCaptureCommand}" />
             <Button Content="Stop"  Command="{Binding StopCaptureCommand}" />
             <Button Content="Interfaces" Command="{Binding OpenInterfacesCommand}" />

@@ -93,4 +93,13 @@ public class PacketListViewModel : INotifyPropertyChanged {
         OnPropertyChanged(nameof(DisplayedCount));
         OnPropertyChanged(nameof(FilterStatus));
     }
+    public void AddPacket (PacketModel packet) {
+        AllPackets.Add(packet);
+        if (currentFilter(packet)){
+            FilteredPackets.Add(packet);
+        }
+        OnPropertyChanged(nameof(TotalCount));
+        OnPropertyChanged(nameof(DisplayedCount));
+        OnPropertyChanged(nameof(FilterStatus));
+    }
 }

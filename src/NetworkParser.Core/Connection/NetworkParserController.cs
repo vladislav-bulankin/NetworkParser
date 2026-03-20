@@ -98,6 +98,64 @@ public class NetworkParserController : INetworkParserController {
             injectionDevice.SendPacket(rawData);
         }
     }
+    public void SaveCapture (string filePath) {
+        using var writer = new CaptureFileWriterDevice(filePath);
+        writer.Open();
+        foreach (var packet in packets) {
+            var raw = new RawCapture(LinkLayers.Ethernet,
+                new PosixTimeval(
+                    (ulong)packet.Timestamp.ToUniversalTime()
+                        .Subtract(DateTime.UnixEpoch).TotalSeconds, 0),
+                packet.RawData);
+            writer.Write(raw);
+        }
+    }
+
+    public List<PacketModel> LoadCapture (string filePath) {
+        var result = new List<PacketModel>();
+        var counter = 0;
+        using var reader = new CaptureFileReaderDevice(filePath);
+        reader.Open();
+        while (reader.GetNextPacket(out PacketCapture capture) == GetPacketStatus.PacketRead) {
+            var raw = capture.GetPacket();
+            var parsed = Packet.ParsePacket(raw.LinkLayerType, raw.Data);
+            var model = new PacketModel {
+                Number = ++counter,
+                Timestamp = raw.Timeval.Date.ToLocalTime(),
+                Length = raw.Data.Length,
+                RawData = raw.Data.ToArray(),
+            };
+
+            if (parsed is EthernetPacket eth) {
+                model.Source = eth.SourceHardwareAddress?.ToString() ?? "N/A";
+                model.Destination = eth.DestinationHardwareAddress?.ToString() ?? "N/A";
+                model.Protocol = eth.Type.ToString();
+
+                if (eth.PayloadPacket is IPPacket ip) {
+                    model.Source = ip.SourceAddress.ToString();
+                    model.Destination = ip.DestinationAddress.ToString();
+
+                    if (ip.PayloadPacket is TcpPacket tcp) {
+                        model.Protocol = "Tcp";
+                        model.Info = BuildTcpInfo(tcp);
+                    } else if (ip.PayloadPacket is UdpPacket udp) {
+                        model.Protocol = "Udp";
+                        model.Info = BuildUdpInfo(udp);
+                    } else if (ip.PayloadPacket is IcmpV4Packet icmp) {
+                        model.Protocol = "Icmp";
+                        model.Info = $"Type={icmp.TypeCode}";
+                    }
+                } else if (eth.PayloadPacket is ArpPacket arp) {
+                    model.Protocol = "Arp";
+                    model.Info = BuildArpInfo(arp);
+                }
+            }
+
+            result.Add(model);
+        }
+
+        return result;
+    }
     private string GuessConnectionType (SharpPcap.ICaptureDevice dev) {
         if (dev.Name.Contains("loopback", StringComparison.OrdinalIgnoreCase)){
             return "Loopback";
