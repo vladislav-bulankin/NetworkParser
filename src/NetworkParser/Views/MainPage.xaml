@@ -16,6 +16,7 @@
             <RowDefinition Height="3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <!-- TOP BAR -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Background="{ThemeResource CommandBarBackground}">
@@ -39,5 +40,18 @@
 
         <!-- HEX -->
         <controls:HexViewerView Grid.Row="3"/>
+        <StackPanel Grid.Row="4" 
+            Orientation="Horizontal" 
+            Spacing="16"
+            Padding="12,4"
+            Background="{ThemeResource CommandBarBackground}">
+            <TextBlock>
+        <Run Text="Packets: "/>
+        <Run Text="{Binding PacketListVM.TotalCount, Mode=OneWay}"/>
+            </TextBlock>
+            <TextBlock 
+        Text="{Binding PacketListVM.FilterStatus, Mode=OneWay}"
+        Opacity="0.7"/>
+        </StackPanel>
     </Grid>
 </Page>

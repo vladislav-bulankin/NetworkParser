@@ -15,6 +15,11 @@ public class PacketListViewModel : INotifyPropertyChanged {
     const int MaxPackets = 5000;
     private PacketModel? selectedPacket;
     private Func<PacketModel, bool> currentFilter = _ => true;
+    public int TotalCount => AllPackets.Count;
+    public int DisplayedCount => FilteredPackets.Count;
+    public string FilterStatus => TotalCount == DisplayedCount
+        ? ""
+        : $"| Displayed: {DisplayedCount}";
     public void SetFilter (Func<PacketModel, bool> filter) {
         currentFilter = filter ?? (_ => true);
         ApplyFilter();
@@ -38,6 +43,9 @@ public class PacketListViewModel : INotifyPropertyChanged {
     public void Clear () {
         FilteredPackets.Clear();
         AllPackets.Clear();
+        OnPropertyChanged(nameof(TotalCount));
+        OnPropertyChanged(nameof(DisplayedCount));
+        OnPropertyChanged(nameof(FilterStatus));
     }
     public PacketListViewModel (INetworkParserController controller) {
         this.controller = controller ?? throw new ArgumentNullException(nameof(controller));
@@ -55,6 +63,9 @@ public class PacketListViewModel : INotifyPropertyChanged {
             AllPackets.Add(packet);
             if (currentFilter(packet)) {
                 FilteredPackets.Add(packet);
+                OnPropertyChanged(nameof(TotalCount));     
+                OnPropertyChanged(nameof(DisplayedCount));
+                OnPropertyChanged(nameof(FilterStatus));
             }
         });
     }
@@ -78,5 +89,8 @@ public class PacketListViewModel : INotifyPropertyChanged {
                 FilteredPackets.Add(packet);
             }
         }
+        OnPropertyChanged(nameof(TotalCount));
+        OnPropertyChanged(nameof(DisplayedCount));
+        OnPropertyChanged(nameof(FilterStatus));
     }
 }
