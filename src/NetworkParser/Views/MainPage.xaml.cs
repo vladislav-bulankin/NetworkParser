@@ -1,3 +1,4 @@
+using NetworkParser.UI.ViewModels;
 using NetworkParser.UI.Views.Dialogs;
 using NetworkParser.ViewModels;
 using NetworkParser.Views.Dialogs;
@@ -23,6 +24,12 @@ public sealed partial class MainPage : Page {
         }
         viewModel.SaveCaptureRequested += OnSaveCapture;
         viewModel.OpenCaptureRequested += OnOpenCapture;
+        viewModel.StatisticsRequested += async () => {
+            var dialog = new StatisticsDialog(new StatisticsViewModel());
+            ((StatisticsViewModel)dialog.DataContext).Build(viewModel.PacketListVM.AllPackets);
+            dialog.XamlRoot = this.XamlRoot;
+            await dialog.ShowAsync();
+        };
     }
     private async Task ShowInterfaceDialogAsync (MainViewModel vm) {
         var dialog = new InterfaceSelectionDialog(vm);
