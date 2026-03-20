@@ -15,8 +15,12 @@ public sealed partial class PacketListView : UserControl {
     }
 
     private void OnRowDoubleTapped (object sender, DoubleTappedRoutedEventArgs e) {
-        if (DataContext is MainViewModel mainVM) {
-            mainVM.PacketListVM.TriggerPacketSelected();
+        var grid = (Grid)this.Content;
+        if (grid.DataContext is PacketListViewModel listVM && listVM.SelectedPacket != null) {
+            listVM.TriggerPacketSelected();
+        }
+        if (DataContext is MainViewModel mainVM && mainVM.PacketListVM.SelectedPacket?.Protocol == "Tcp") {
+            mainVM.ShowTcpStream(mainVM.PacketListVM.SelectedPacket, this.XamlRoot);
         }
     }
 

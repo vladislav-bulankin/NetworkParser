@@ -138,9 +138,13 @@ public class NetworkParserController : INetworkParserController {
                     if (ip.PayloadPacket is TcpPacket tcp) {
                         model.Protocol = "Tcp";
                         model.Info = BuildTcpInfo(tcp);
+                        model.SourcePort = tcp.SourcePort;
+                        model.DestinationPort = tcp.DestinationPort;
                     } else if (ip.PayloadPacket is UdpPacket udp) {
                         model.Protocol = "Udp";
                         model.Info = BuildUdpInfo(udp);
+                        model.SourcePort = udp.SourcePort;
+                        model.DestinationPort = udp.DestinationPort;
                     } else if (ip.PayloadPacket is IcmpV4Packet icmp) {
                         model.Protocol = "Icmp";
                         model.Info = $"Type={icmp.TypeCode}";

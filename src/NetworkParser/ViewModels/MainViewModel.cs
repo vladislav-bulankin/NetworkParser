@@ -5,6 +5,8 @@ using NetworkParser.Core.Abstractions.Connection;
 using NetworkParser.Core.Helpers;
 using NetworkParser.Domain.Interfaces;
 using NetworkParser.Domain.Packets;
+using NetworkParser.UI.ViewModels;
+using NetworkParser.UI.Views.Dialogs;
 
 namespace NetworkParser.ViewModels;
 
@@ -116,6 +118,15 @@ public class MainViewModel : INotifyPropertyChanged {
         InterfaceSelectionRequested?.Invoke();
     }
     public event Action? InterfaceSelectionRequested;
+    public async void ShowTcpStream (PacketModel packet, XamlRoot xamlRoot) {
+        if (packet.Protocol != "Tcp"){ return; }
+        var vm = new TcpStreamViewModel();
+        vm.BuildStream(packet, PacketListVM.AllPackets);
+
+        var dialog = new TcpStreamDialog(vm);
+        dialog.XamlRoot = xamlRoot;
+        await dialog.ShowAsync();
+    }
     private void OnPacketSelected (PacketModel packet) {
         PacketDetailsVM.SetPacket(packet);
         HexViewerVM.SetPacket(packet);

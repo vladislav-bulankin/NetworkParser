@@ -70,5 +70,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-
+    <ItemGroup>
+        <Page Update="Views\Dialogs\TcpStreamDialog.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+    </ItemGroup>
 </Project>
