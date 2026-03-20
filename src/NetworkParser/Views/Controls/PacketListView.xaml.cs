@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using NetworkParser.Domain.Packets;
 using NetworkParser.UI.Views.Converters;
 using NetworkParser.ViewModels;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace NetworkParser.Views.Controls;
 
@@ -23,7 +24,20 @@ public sealed partial class PacketListView : UserControl {
             mainVM.ShowTcpStream(mainVM.PacketListVM.SelectedPacket, this.XamlRoot);
         }
     }
+    private void OnCopyRow (object sender, RoutedEventArgs e) {
+        var grid = (Grid)this.Content;
+        if (grid.DataContext is PacketListViewModel vm && vm.SelectedPacket != null) {
+            var p = vm.SelectedPacket;
+            var text = $"{p.Number}\t{p.Timestamp:HH:mm:ss.fff}\t{p.Source}\t{p.Destination}\t{p.Protocol}\t{p.Length}\t{p.Info}";
+            var dp = new DataPackage();
+            dp.SetText(text);
+            Clipboard.SetContent(dp);
+        }
+    }
 
+    private void OnFollowStream (object sender, RoutedEventArgs e) {
+        OnRowDoubleTapped(sender, null);
+    }
     private void OnLoadingRow (object sender, DataGridRowEventArgs e) {
         if (e.Row.DataContext is PacketModel packet) {
             var converter = new ProtocolColorConverter();

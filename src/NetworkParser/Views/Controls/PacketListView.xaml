@@ -25,7 +25,12 @@
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch"
             DoubleTapped="OnRowDoubleTapped">
-
+            <toolkit:DataGrid.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Text="Copy Row" Click="OnCopyRow"/>
+                    <MenuFlyoutItem Text="Follow TCP Stream" Click="OnFollowStream"/>
+                </MenuFlyout>
+            </toolkit:DataGrid.ContextFlyout>
             <toolkit:DataGrid.Columns>
                 <toolkit:DataGridTextColumn 
                     Header="#" 

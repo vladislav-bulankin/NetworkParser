@@ -12,9 +12,23 @@
     <Grid DataContext="{Binding HexViewerVM}">
         <ScrollViewer>
             <TextBlock
-                FontFamily="Consolas"
-                Text="{Binding HexDump}"
-                TextWrapping="NoWrap"/> 
+            FontFamily="Consolas"
+            Text="{Binding HexDump}"
+            TextWrapping="NoWrap"/>
         </ScrollViewer>
+
+        <Button
+            Content="⎘"
+            FontSize="14"
+            Width="32"
+            Height="32"
+            Padding="0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Margin="0,0,8,8"
+            Opacity="0.5"
+            Canvas.ZIndex="1"
+            ToolTipService.ToolTip="Copy Hex"
+            Click="OnCopyHex"/>
     </Grid>
 </UserControl>
