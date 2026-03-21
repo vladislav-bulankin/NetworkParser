@@ -1,8 +1,9 @@
+using Microsoft.UI.Xaml.Input;
 using NetworkParser.UI.ViewModels;
 using NetworkParser.UI.Views.Dialogs;
 using NetworkParser.ViewModels;
 using NetworkParser.Views.Dialogs;
-using Windows.Storage.Pickers;
+using Uno.Extensions.Specialized;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -13,6 +14,7 @@ namespace NetworkParser.UI.Views;
 /// </summary>
 public sealed partial class MainPage : Page {
     public MainViewModel ViewModel { get; }
+    private int searchIndex = 0;
     public MainPage (MainViewModel viewModel) {
         this.InitializeComponent();
         ViewModel = viewModel;
@@ -31,6 +33,27 @@ public sealed partial class MainPage : Page {
             await dialog.ShowAsync();
         };
     }
+
+    private void OnSearchTextChanged (object sender, TextChangedEventArgs e) {
+        searchIndex = -1; 
+        var vm = ViewModel.PacketListVM;
+
+        if (string.IsNullOrWhiteSpace(SearchBox.Text)) {
+            SearchResultText.Text = "";
+            return;
+        }
+
+        var result = vm.SearchNext(SearchBox.Text, 0);
+        if (result != null) {
+            searchIndex = vm.FilteredPackets.IndexOf(result);
+            vm.SelectedPacket = result;
+            PacketListControl.ScrollToPacket(result);
+            SearchResultText.Text = $"1 of {CountMatches(vm, SearchBox.Text)}";
+        } else {
+            SearchResultText.Text = "Not found";
+        }
+    }
+
     private async Task ShowInterfaceDialogAsync (MainViewModel vm) {
         var dialog = new InterfaceSelectionDialog(vm);
         dialog.XamlRoot = this.XamlRoot;
@@ -57,5 +80,72 @@ public sealed partial class MainPage : Page {
         if (path != null){
             ((MainViewModel)DataContext).LoadCapture(path);
         }
+    }
+    private void OnCloseSearch (object sender, RoutedEventArgs e) {
+        ViewModel.PacketListVM.IsSearchVisible = false;
+        SearchBox.Text = "";
+        SearchResultText.Text = "";
+        searchIndex = 0;
+    }
+
+    private void OnSearchKeyDown (object sender, KeyRoutedEventArgs e) {
+        if (e.Key == Windows.System.VirtualKey.Enter) {
+            OnSearchNext(sender, e);
+        }
+        if (e.Key == Windows.System.VirtualKey.Escape) {
+            OnCloseSearch(sender, e);
+        }
+    }
+
+    private void OnSearchNext (object sender, RoutedEventArgs e) {
+        var vm = ViewModel.PacketListVM; 
+
+        if (string.IsNullOrWhiteSpace(SearchBox.Text)){ return; }
+        var result = vm.SearchNext(SearchBox.Text, searchIndex + 1);
+        if (result == null) {
+            searchIndex = -1;
+            result = vm.SearchNext(SearchBox.Text, 0);
+        }
+
+        if (result != null) {
+            searchIndex = vm.FilteredPackets.IndexOf(result);
+            vm.SelectedPacket = result;
+            PacketListControl.ScrollToPacket(result);
+            SearchResultText.Text = $"{searchIndex + 1} of {CountMatches(vm, SearchBox.Text)}";
+        } else { SearchResultText.Text = "Not found"; }
+    }
+
+    private void OnSearchPrev (object sender, RoutedEventArgs e) {
+        var vm = ViewModel.PacketListVM;
+
+        if (string.IsNullOrWhiteSpace(SearchBox.Text)){ return; }
+        var query = SearchBox.Text.ToLower();
+        var matches = vm.FilteredPackets
+            .Where(p =>
+                (p.Source?.ToLower().Contains(query) ?? false) ||
+                (p.Destination?.ToLower().Contains(query) ?? false) ||
+                (p.Protocol?.ToLower().Contains(query) ?? false) ||
+                (p.Info?.ToLower().Contains(query) ?? false) ||
+                p.Number.ToString().Contains(query))
+            .ToList();
+
+        if (matches.Count == 0) { SearchResultText.Text = "Not found"; return; }
+        var prevIndex = matches.FindLastIndex(p => vm.FilteredPackets.IndexOf(p) < searchIndex);
+        var result = prevIndex >= 0 ? matches[prevIndex] : matches.Last();
+
+        searchIndex = vm.FilteredPackets.IndexOf(result);
+        vm.SelectedPacket = result;
+        PacketListControl.ScrollToPacket(result);
+        SearchResultText.Text = $"{searchIndex + 1} of {matches.Count}";
+    }
+
+    private int CountMatches (PacketListViewModel vm, string query) {
+        query = query.ToLower();
+        return vm.FilteredPackets.Count(p =>
+            (p.Source?.ToLower().Contains(query) ?? false) ||
+            (p.Destination?.ToLower().Contains(query) ?? false) ||
+            (p.Protocol?.ToLower().Contains(query) ?? false) ||
+            (p.Info?.ToLower().Contains(query) ?? false) ||
+            p.Number.ToString().Contains(query));
     }
 }

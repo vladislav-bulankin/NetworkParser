@@ -12,8 +12,7 @@
 
       <!-- Add resources here -->
             <converters:TimestampConverter x:Key="TimestampConverter"/>
-
-    </ResourceDictionary>
+        </ResourceDictionary>
   </Application.Resources>
 
 </Application>

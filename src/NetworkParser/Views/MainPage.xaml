@@ -26,6 +26,7 @@
             <Button Content="Stop"  Command="{Binding StopCaptureCommand}" />
             <Button Content="Interfaces" Command="{Binding OpenInterfacesCommand}" />
             <Button Content="Statistics" Command="{Binding ShowStatisticsCommand}"/>
+            <Button Content="Search" Command="{Binding OpenSearchCommand}"/>
             <TextBox
                 PlaceholderText="Filter (e.g. tcp, 192.168, http)"
                 Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -35,26 +36,47 @@
                 Margin="15"/>
         </StackPanel>
 
-        <!-- PACKET LIST -->
-        <controls:PacketListView Grid.Row="1"/>
+        <!-- PACKET LIST
+        <controls:PacketListView Grid.Row="1"/> -->
 
         <!-- DETAILS -->
         <controls:PacketDetailsView Grid.Row="2"/>
 
         <!-- HEX -->
         <controls:HexViewerView Grid.Row="3"/>
+        <controls:PacketListView x:Name="PacketListControl" Grid.Row="1"/>
+        <!-- STATUS BAR -->
         <StackPanel Grid.Row="4" 
             Orientation="Horizontal" 
             Spacing="16"
             Padding="12,4"
             Background="{ThemeResource CommandBarBackground}">
             <TextBlock>
-        <Run Text="Packets: "/>
-        <Run Text="{Binding PacketListVM.TotalCount, Mode=OneWay}"/>
+                <Run Text="Packets: "/>
+                <Run Text="{Binding PacketListVM.TotalCount, Mode=OneWay}"/>    
             </TextBlock>
             <TextBlock 
-        Text="{Binding PacketListVM.FilterStatus, Mode=OneWay}"
-        Opacity="0.7"/>
+                Text="{Binding PacketListVM.FilterStatus, Mode=OneWay}"
+                Opacity="0.7"/>
+            <!-- разделитель -->
+            <TextBlock Text="|" Opacity="0.4"/>
+
+            <!-- панель поиска прямо здесь -->
+            <StackPanel Orientation="Horizontal"
+                Spacing="8"
+                Visibility="{Binding PacketListVM.SearchVisibility}">
+                <TextBox x:Name="SearchBox"
+                 PlaceholderText="Search..."
+                 Width="220"
+                 Height="28"
+                 KeyDown="OnSearchKeyDown"
+                 TextChanged="OnSearchTextChanged"/>
+                <Button Content="▼" Width="32" Height="28" Click="OnSearchNext"/>
+                <Button Content="▲" Width="32" Height="28" Click="OnSearchPrev"/>
+                <TextBlock x:Name="SearchResultText" VerticalAlignment="Center" Opacity="0.6"/>
+                <Button Content="✕" Width="32" Height="28" Click="OnCloseSearch"/>
+            </StackPanel>
+
         </StackPanel>
     </Grid>
 </Page>

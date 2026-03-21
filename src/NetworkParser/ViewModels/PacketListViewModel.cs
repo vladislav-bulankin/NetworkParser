@@ -47,6 +47,19 @@ public class PacketListViewModel : INotifyPropertyChanged {
         OnPropertyChanged(nameof(DisplayedCount));
         OnPropertyChanged(nameof(FilterStatus));
     }
+
+    private bool isSearchVisible;
+    public bool IsSearchVisible
+    {
+        get => isSearchVisible;
+        set {
+            isSearchVisible = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SearchVisibility));
+        }
+    }
+    public Visibility SearchVisibility => isSearchVisible ? Visibility.Visible : Visibility.Collapsed;
+
     public PacketListViewModel (INetworkParserController controller) {
         this.controller = controller ?? throw new ArgumentNullException(nameof(controller));
         this.controller.PacketCaptured += OnPacketCaptured;
@@ -101,5 +114,33 @@ public class PacketListViewModel : INotifyPropertyChanged {
         OnPropertyChanged(nameof(TotalCount));
         OnPropertyChanged(nameof(DisplayedCount));
         OnPropertyChanged(nameof(FilterStatus));
+    }
+
+    public PacketModel? Search (string query) {
+        if (string.IsNullOrWhiteSpace(query))
+            return null;
+        query = query.ToLower();
+
+        return FilteredPackets.FirstOrDefault(p =>
+            (p.Source?.ToLower().Contains(query) ?? false) ||
+            (p.Destination?.ToLower().Contains(query) ?? false) ||
+            (p.Protocol?.ToLower().Contains(query) ?? false) ||
+            (p.Info?.ToLower().Contains(query) ?? false) ||
+            p.Number.ToString().Contains(query));
+    }
+
+    public PacketModel? SearchNext (string query, int fromIndex) {
+        if (string.IsNullOrWhiteSpace(query))
+            return null;
+        query = query.ToLower();
+
+        return FilteredPackets
+            .Skip(fromIndex)
+            .FirstOrDefault(p =>
+                (p.Source?.ToLower().Contains(query) ?? false) ||
+                (p.Destination?.ToLower().Contains(query) ?? false) ||
+                (p.Protocol?.ToLower().Contains(query) ?? false) ||
+                (p.Info?.ToLower().Contains(query) ?? false) ||
+                p.Number.ToString().Contains(query));
     }
 }

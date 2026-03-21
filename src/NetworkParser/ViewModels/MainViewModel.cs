@@ -60,6 +60,7 @@ public class MainViewModel : INotifyPropertyChanged {
     public RelayCommand SaveCaptureCommand { get; }
     public RelayCommand OpenCaptureCommand { get; }
     public RelayCommand ShowStatisticsCommand { get; }
+    public RelayCommand OpenSearchCommand { get; }
     public MainViewModel (
             INetworkParserController controller,
             PacketListViewModel listVM,
@@ -82,6 +83,7 @@ public class MainViewModel : INotifyPropertyChanged {
         SaveCaptureCommand = new RelayCommand(() => SaveCaptureRequested?.Invoke());
         OpenCaptureCommand = new RelayCommand(() => OpenCaptureRequested?.Invoke());
         ShowStatisticsCommand = new RelayCommand(() => StatisticsRequested?.Invoke());
+        OpenSearchCommand = new RelayCommand(() => PacketListVM.IsSearchVisible = true);
     }
     public event Action? StatisticsRequested;
     public event Action? SaveCaptureRequested;

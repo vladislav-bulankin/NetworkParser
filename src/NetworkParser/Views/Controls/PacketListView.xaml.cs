@@ -1,5 +1,3 @@
-// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
-
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Input;
@@ -11,10 +9,13 @@ using Windows.ApplicationModel.DataTransfer;
 namespace NetworkParser.Views.Controls;
 
 public sealed partial class PacketListView : UserControl {
+
     public PacketListView () {
         this.InitializeComponent();
     }
-
+    public void ScrollToPacket (object packet) {
+        PacketsDataGrid.ScrollIntoView(packet, null);
+    }
     private void OnRowDoubleTapped (object sender, DoubleTappedRoutedEventArgs e) {
         var grid = (Grid)this.Content;
         if (grid.DataContext is PacketListViewModel listVM && listVM.SelectedPacket != null) {
@@ -48,5 +49,11 @@ public sealed partial class PacketListView : UserControl {
             e.Row.Foreground = new SolidColorBrush(Colors.White);
         }
     }
-
+    private void OnDataGridKeyDown (object sender, KeyRoutedEventArgs e) {
+        if (e.Key == Windows.System.VirtualKey.F &&
+            Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(
+                Windows.System.VirtualKey.Control)
+                .HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down)) {
+        }
+    }
 }
