@@ -32,6 +32,11 @@ public sealed partial class MainPage : Page {
             dialog.XamlRoot = this.XamlRoot;
             await dialog.ShowAsync();
         };
+        viewModel.CrafterRequested += async () => {
+            var dialog = new PacketCrafterDialog(viewModel.PacketCrafterVM);
+            dialog.XamlRoot = this.XamlRoot;
+            await dialog.ShowAsync();
+        };
     }
 
     private void OnSearchTextChanged (object sender, TextChangedEventArgs e) {

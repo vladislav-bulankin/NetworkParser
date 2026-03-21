@@ -1,0 +1,85 @@
+﻿<ContentDialog
+    x:Class="NetworkParser.UI.Views.Dialogs.PacketCrafterDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NetworkParser.UI.Views.Dialogs"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Style="{ThemeResource DefaultContentDialogStyle}"
+    Title="Packet Crafter"
+    CloseButtonText="Close"
+    MinWidth="700">
+    <Pivot>
+        <!-- ARP Spoofing -->
+        <PivotItem Header="ARP Spoof">
+            <StackPanel Spacing="12" Margin="0,12,0,0">
+                <TextBlock Text="Send fake ARP Reply to poison ARP cache" Opacity="0.6"/>
+                <TextBox Header="Target IP (who to poison)"
+                         PlaceholderText="192.168.0.1"
+                         Text="{Binding ArpTargetIp, Mode=TwoWay}"/>
+                <TextBox Header="Spoofed IP (whose IP to steal)"
+                         PlaceholderText="192.168.0.254"
+                         Text="{Binding ArpSpoofedIp, Mode=TwoWay}"/>
+                <TextBox Header="Sender MAC (your MAC or fake)"
+                         PlaceholderText="DE:AD:BE:EF:00:01"
+                         Text="{Binding ArpSenderMac, Mode=TwoWay}"/>
+                <Button Content="Send ARP Reply"
+                        Command="{Binding SendArpCommand}"
+                        HorizontalAlignment="Left"/>
+                <TextBlock Text="{Binding ArpStatus}" Foreground="LightGreen"/>
+            </StackPanel>
+        </PivotItem>
+
+        <!-- TCP RST -->
+        <PivotItem Header="TCP RST">
+            <StackPanel Spacing="12" Margin="0,12,0,0">
+                <TextBlock Text="Send TCP RST to terminate a connection" Opacity="0.6"/>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="120"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Header="Source IP"
+                             PlaceholderText="192.168.0.111"
+                             Text="{Binding RstSrcIp, Mode=TwoWay}"/>
+                    <TextBox Grid.Column="1" Header="Source Port"
+                             PlaceholderText="12345"
+                             Text="{Binding RstSrcPort, Mode=TwoWay}"/>
+                </Grid>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="120"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Header="Destination IP"
+                             PlaceholderText="20.50.88.244"
+                             Text="{Binding RstDstIp, Mode=TwoWay}"/>
+                    <TextBox Grid.Column="1" Header="Destination Port"
+                             PlaceholderText="443"
+                             Text="{Binding RstDstPort, Mode=TwoWay}"/>
+                </Grid>
+                <Button Content="Send TCP RST"
+                        Command="{Binding SendRstCommand}"
+                        HorizontalAlignment="Left"/>
+                <TextBlock Text="{Binding RstStatus}" Foreground="LightGreen"/>
+            </StackPanel>
+        </PivotItem>
+
+        <!-- Hex Editor -->
+        <PivotItem Header="Hex Editor">
+            <StackPanel Spacing="12" Margin="0,12,0,0">
+                <TextBlock Text="Paste raw hex bytes to send as packet" Opacity="0.6"/>
+                <TextBox Header="Hex bytes (space separated)"
+                         PlaceholderText="Hex bytes (space separated)"
+                         Text="{Binding HexInput, Mode=TwoWay}"
+                         AcceptsReturn="True"
+                         Height="160"
+                         FontFamily="Consolas"
+                         TextWrapping="Wrap"/>
+                <Button Content="Send Packet"
+                        Command="{Binding SendHexCommand}"
+                        HorizontalAlignment="Left"/>
+                <TextBlock Text="{Binding HexStatus}" Foreground="LightGreen"/>
+            </StackPanel>
+        </PivotItem>
+    </Pivot>
+</ContentDialog>

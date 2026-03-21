@@ -27,6 +27,7 @@
             <Button Content="Interfaces" Command="{Binding OpenInterfacesCommand}" />
             <Button Content="Statistics" Command="{Binding ShowStatisticsCommand}"/>
             <Button Content="Search" Command="{Binding OpenSearchCommand}"/>
+            
             <TextBox
                 PlaceholderText="Filter (e.g. tcp, 192.168, http)"
                 Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -76,6 +77,8 @@
                 <TextBlock x:Name="SearchResultText" VerticalAlignment="Center" Opacity="0.6"/>
                 <Button Content="✕" Width="32" Height="28" Click="OnCloseSearch"/>
             </StackPanel>
+
+            <Button Content="Crafter" Command="{Binding OpenCrafterCommand}"/>
 
         </StackPanel>
     </Grid>

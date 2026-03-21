@@ -2,6 +2,7 @@ using NetworkParser.Core.Abstractions.Connection;
 using NetworkParser.Core.Abstractions.Parsers;
 using NetworkParser.Core.Connection;
 using NetworkParser.Core.Parsers;
+using NetworkParser.UI.ViewModels;
 using NetworkParser.ViewModels;
 
 namespace NetworkParser.UI.Extensions;
@@ -14,6 +15,7 @@ internal static class ServiceCollectionExtionsions {
         services.AddSingleton<PacketListViewModel>();
         services.AddSingleton<PacketDetailsViewModel>();
         services.AddSingleton<HexViewerViewModel>();
+        services.AddSingleton<PacketCrafterViewModel>();
         services.AddSingleton<NetworkParser.UI.Views.MainPage>();
     }
 }

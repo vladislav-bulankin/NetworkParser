@@ -17,7 +17,8 @@ public class MainViewModel : INotifyPropertyChanged {
     public PacketListViewModel PacketListVM { get; }
     public PacketDetailsViewModel PacketDetailsVM { get; }
     public HexViewerViewModel HexViewerVM { get; }
-    
+    public PacketCrafterViewModel PacketCrafterVM { get; }
+
     private string filterText;
     private Func<PacketModel, bool> currentFilter = _ => true;
     public string FilterText
@@ -61,13 +62,15 @@ public class MainViewModel : INotifyPropertyChanged {
     public RelayCommand OpenCaptureCommand { get; }
     public RelayCommand ShowStatisticsCommand { get; }
     public RelayCommand OpenSearchCommand { get; }
+    public RelayCommand OpenCrafterCommand { get; }
     public MainViewModel (
             INetworkParserController controller,
             PacketListViewModel listVM,
             PacketDetailsViewModel detailsVM,
-            HexViewerViewModel hexVM) {
+            HexViewerViewModel hexVM,
+            PacketCrafterViewModel crafterVM) {
         this.controller = controller;
-
+        PacketCrafterVM = crafterVM;
         PacketListVM = listVM;
         PacketDetailsVM = detailsVM;
         HexViewerVM = hexVM;
@@ -84,10 +87,12 @@ public class MainViewModel : INotifyPropertyChanged {
         OpenCaptureCommand = new RelayCommand(() => OpenCaptureRequested?.Invoke());
         ShowStatisticsCommand = new RelayCommand(() => StatisticsRequested?.Invoke());
         OpenSearchCommand = new RelayCommand(() => PacketListVM.IsSearchVisible = true);
+        OpenCrafterCommand = new RelayCommand(() => CrafterRequested?.Invoke());
     }
     public event Action? StatisticsRequested;
     public event Action? SaveCaptureRequested;
     public event Action? OpenCaptureRequested;
+    public event Action? CrafterRequested;
     public void SaveCapture (string filePath) {
         controller.SaveCapture(filePath);
     }
