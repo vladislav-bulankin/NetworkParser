@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net;
+using NetworkParser.Core.Abstractions.Parsers;
+using NetworkParser.Core.Parsers;
 using NetworkParser.Domain.Packets;
 using NetworkParser.Domain.Protocols;
 using PacketDotNet;
@@ -12,6 +14,10 @@ public class PacketDetailsViewModel : INotifyPropertyChanged {
         = new ObservableCollection<ProtocolModel>();
     public event PropertyChangedEventHandler? PropertyChanged;
     private Dictionary<string, string> dnsChach = new();
+    private readonly ITlsParser tlsParser;
+    public PacketDetailsViewModel (ITlsParser tlsParser) {
+        this.tlsParser = tlsParser;
+    }
     public async Task SetPacket (PacketModel packet) {
         ProtocolTree.Clear();
         if (packet == null){ return; }
@@ -55,6 +61,15 @@ public class PacketDetailsViewModel : INotifyPropertyChanged {
                     flagsNode.Children.Add(new ProtocolModel($"FIN: {tcp.Finished}"));
                     flagsNode.Children.Add(new ProtocolModel($"RST: {tcp.Reset}"));
                     flagsNode.Children.Add(new ProtocolModel($"PSH: {tcp.Push}"));
+                    if (tcp.PayloadData?.Length > 0) {
+                        var sni = tlsParser.ExtractSni(tcp.PayloadData);
+                        if (sni != null) {
+                            var tlsNode = new ProtocolModel("Transport Layer Security");
+                            tlsNode.Children.Add(new ProtocolModel("Handshake: ClientHello"));
+                            tlsNode.Children.Add(new ProtocolModel($"SNI: {sni}"));
+                            ProtocolTree.Add(tlsNode);
+                        }
+                    }
                     tcpNode.Children.Add(flagsNode);
                     ProtocolTree.Add(tcpNode);
                 } else if (ip.PayloadPacket is UdpPacket udp) {

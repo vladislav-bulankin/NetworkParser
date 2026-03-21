@@ -10,7 +10,8 @@ internal class ProtocolColorConverter : IValueConverter {
             "Udp" => new SolidColorBrush(Color.FromArgb(255, 20, 70, 30)), 
             "Dns" => new SolidColorBrush(Color.FromArgb(255, 70, 25, 100)),  
             "Arp" => new SolidColorBrush(Color.FromArgb(255, 90, 75, 10)), 
-            "Icmp" => new SolidColorBrush(Color.FromArgb(255, 100, 45, 10)),  
+            "Icmp" => new SolidColorBrush(Color.FromArgb(255, 100, 45, 10)),
+            "Tls" => new SolidColorBrush(Color.FromArgb(255, 0, 80, 80)),
             _ => new SolidColorBrush(Color.FromArgb(255, 40, 40, 40)),   
         };
     }

@@ -1,5 +1,7 @@
 using System.Net.NetworkInformation;
 using NetworkParser.Core.Abstractions.Connection;
+using NetworkParser.Core.Abstractions.Parsers;
+using NetworkParser.Core.Parsers;
 using NetworkParser.Domain.Interfaces;
 using NetworkParser.Domain.Packets;
 using PacketDotNet;
@@ -9,10 +11,14 @@ using SharpPcap.LibPcap;
 namespace NetworkParser.Core.Connection; 
 public class NetworkParserController : INetworkParserController {
     private ICaptureDevice? device;
+    private readonly ITlsParser tlsParser;
     private int packetCounter = 0;
     private readonly List<PacketModel> packets = new();
 
     public event Action<PacketModel>? PacketCaptured;
+    public NetworkParserController (ITlsParser tlsParser) {
+        this.tlsParser = tlsParser;
+    }
     /// <summary>
     /// Получение списка сетевых интерфейсов (для UI)
     /// </summary>
@@ -140,6 +146,19 @@ public class NetworkParserController : INetworkParserController {
                         model.Info = BuildTcpInfo(tcp);
                         model.SourcePort = tcp.SourcePort;
                         model.DestinationPort = tcp.DestinationPort;
+                        // детектим TLS
+                        if ((tcp.DestinationPort == 443 || tcp.SourcePort == 443) &&
+                            tcp.PayloadData?.Length > 0) {
+                            var sni = tlsParser.ExtractSni(tcp.PayloadData);
+                            if (sni != null) {
+                                model.Protocol = "TLS";
+                                model.Info = $"ClientHello SNI: {sni}";
+                            } else {
+                                model.Info = BuildTcpInfo(tcp);
+                            }
+                        } else {
+                            model.Info = BuildTcpInfo(tcp);
+                        }
                     } else if (ip.PayloadPacket is UdpPacket udp) {
                         model.Protocol = "Udp";
                         model.Info = BuildUdpInfo(udp);
@@ -161,16 +180,16 @@ public class NetworkParserController : INetworkParserController {
         return result;
     }
     private string GuessConnectionType (SharpPcap.ICaptureDevice dev) {
-        if (dev.Name.Contains("loopback", StringComparison.OrdinalIgnoreCase)){
+        if (dev.Name.Contains("loopback", StringComparison.OrdinalIgnoreCase)) {
             return "Loopback";
         }
-        if (dev.Name.Contains("wlan") || dev.Description?.Contains("Wireless") == true){
+        if (dev.Name.Contains("wlan") || dev.Description?.Contains("Wireless") == true) {
             return "Wi-Fi";
         }
-        if (dev.Name.Contains("eth") || dev.Description?.Contains("Ethernet") == true){
+        if (dev.Name.Contains("eth") || dev.Description?.Contains("Ethernet") == true) {
             return "Ethernet";
         }
-        if (dev.Name.Contains("tun") || dev.Name.Contains("tap")){
+        if (dev.Name.Contains("tun") || dev.Name.Contains("tap")) {
             return "VPN/Tunnel";
         }
         return "Unknown";
@@ -225,19 +244,19 @@ public class NetworkParserController : INetworkParserController {
 
     private static string BuildTcpInfo (TcpPacket tcp) {
         var flags = new List<string>();
-        if (tcp.Synchronize){
+        if (tcp.Synchronize) {
             flags.Add("SYN");
         }
-        if (tcp.Acknowledgment){
+        if (tcp.Acknowledgment) {
             flags.Add("ACK");
         }
-        if (tcp.Finished){
+        if (tcp.Finished) {
             flags.Add("FIN");
         }
-        if (tcp.Reset){
+        if (tcp.Reset) {
             flags.Add("RST");
         }
-        if (tcp.Push){
+        if (tcp.Push) {
             flags.Add("PSH");
         }
 

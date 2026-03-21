@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using NetworkParser.Core.Abstractions.Connection;
+using NetworkParser.Core.Abstractions.Parsers;
 using NetworkParser.Core.Connection;
+using NetworkParser.Core.Parsers;
 using NetworkParser.ViewModels;
 
 namespace NetworkParser.UI.Extensions;
 
 internal static class ServiceCollectionExtionsions {
     internal static void InjectAll (this IServiceCollection services) {
+        services.AddSingleton<ITlsParser, TlsParser>();
         services.AddSingleton<INetworkParserController, NetworkParserController>();
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<PacketListViewModel>();

@@ -41,6 +41,7 @@ public static class PacketFilterBuilder {
             "tcp" => p.Protocol == "Tcp",
             "udp" => p.Protocol == "Udp",
             "http" => p.Info?.Contains("HTTP") ?? false,
+            "tls" => p.Protocol == "Tls",
             _ => false
         };
     }
