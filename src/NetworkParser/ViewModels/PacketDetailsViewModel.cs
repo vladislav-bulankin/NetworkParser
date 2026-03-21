@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Net;
 using NetworkParser.Domain.Packets;
 using NetworkParser.Domain.Protocols;
 using PacketDotNet;
@@ -10,7 +11,8 @@ public class PacketDetailsViewModel : INotifyPropertyChanged {
     public ObservableCollection<ProtocolModel> ProtocolTree { get; }
         = new ObservableCollection<ProtocolModel>();
     public event PropertyChangedEventHandler? PropertyChanged;
-    public void SetPacket (PacketModel packet) {
+    private Dictionary<string, string> dnsChach = new();
+    public async Task SetPacket (PacketModel packet) {
         ProtocolTree.Clear();
         if (packet == null){ return; }
         var parsed = Packet.ParsePacket(LinkLayers.Ethernet, packet.RawData);
@@ -22,9 +24,19 @@ public class PacketDetailsViewModel : INotifyPropertyChanged {
             ethNode.Children.Add(new ProtocolModel($"Type: {eth.Type}"));
             ProtocolTree.Add(ethNode);
             if (eth.PayloadPacket is IPPacket ip) {
-                var ipNode = new ProtocolModel($"Internet Protocol ({ip.Version})");
-                ipNode.Children.Add(new ProtocolModel($"Source: {ip.SourceAddress}"));
-                ipNode.Children.Add(new ProtocolModel($"Destination: {ip.DestinationAddress}"));
+                if (!dnsChach.Keys.Contains(ip.SourceAddress.ToString())) {
+                    await AddToDnsCachAsync(ip.SourceAddress.ToString());
+                }
+                if (!dnsChach.Keys.Contains(ip.DestinationAddress.ToString())) {
+                    await AddToDnsCachAsync(ip.DestinationAddress.ToString());
+                }
+                    var srcIpStr = $"{ip.SourceAddress.ToString()} | " +
+                        $"{dnsChach[ip.SourceAddress.ToString()]}";
+                    var dstIpStr = $"{ip.DestinationAddress.ToString()} | " +
+                        $"{dnsChach[ip.DestinationAddress.ToString()]}";
+                    var ipNode = new ProtocolModel($"Internet Protocol ({ip.Version})");
+                ipNode.Children.Add(new ProtocolModel($"Source: {srcIpStr}"));
+                ipNode.Children.Add(new ProtocolModel($"Destination: {dstIpStr}"));
                 ipNode.Children.Add(new ProtocolModel($"TTL: {ip.TimeToLive}"));
                 ipNode.Children.Add(new ProtocolModel($"Protocol: {ip.Protocol}"));
                 var headerLen = ip.Version == IPVersion.IPv6 ? 40 : ip.HeaderLength;
@@ -73,5 +85,14 @@ public class PacketDetailsViewModel : INotifyPropertyChanged {
     protected virtual void OnPropertyChanged
         ([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null) {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private async Task AddToDnsCachAsync(string ip) {
+        IPHostEntry entry = null;
+        try {
+            entry = await Dns.GetHostEntryAsync(ip).ConfigureAwait(true);
+        } catch { /*ignore*/ } finally {
+            dnsChach.Add(ip, entry?.HostName ?? string.Empty);
+        }
     }
 }
