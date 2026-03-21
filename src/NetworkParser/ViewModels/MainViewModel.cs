@@ -95,6 +95,8 @@ public class MainViewModel : INotifyPropertyChanged {
     public void LoadCapture (string filePath) {
         controller.StopCapture();
         PacketListVM.Clear();
+        PacketDetailsVM.SetPacket(null);
+        HexViewerVM.SetPacket(null);
         var loaded = controller.LoadCapture(filePath);
         foreach (var p in loaded){
             PacketListVM.AddPacket(p);
@@ -103,6 +105,8 @@ public class MainViewModel : INotifyPropertyChanged {
     public void StartSniffing () {
         if (SelectedInterface == null){ return; }
         PacketListVM.Clear();
+        PacketDetailsVM.SetPacket(null);
+        HexViewerVM.SetPacket(null);
         controller.StopCapture();
         controller.StartCapture(SelectedInterface.Index, CaptureFilter);
     }
