@@ -1,14 +1,10 @@
-using NetworkParser.UI.Views;
-using Uno.Resizetizer;
 using NetworkParser.UI.Extensions;
+using NetworkParser.UI.Views;
 
 namespace NetworkParser;
 
 public partial class App : Application {
-    /// <summary>
-    /// Initializes the singleton application object. This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
-    /// </summary>
+
     public App () {
         this.InitializeComponent();
 
@@ -18,6 +14,10 @@ public partial class App : Application {
     protected IHost? Host { get; private set; }
 
     protected override void OnLaunched (LaunchActivatedEventArgs args) {
+        if (!IsPcapInstalled()) {
+            ShowDriverError();
+            return; // Прекращаем запуск
+        }
         var builder = this.CreateBuilder(args)
         .Configure(host => host
 #if DEBUG
@@ -53,5 +53,29 @@ public partial class App : Application {
 
         MainWindow.Content = mainPage;
         MainWindow.Activate();
+    }
+
+    private bool IsPcapInstalled () {
+        try {
+            // Пытаемся получить список устройств
+            return SharpPcap.LibPcap.LibPcapLiveDeviceList.Instance.Count > 0;
+        } catch {
+            return false;
+        }
+    }
+
+    private void ShowDriverError () {
+        var visual = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+        visual.Children.Add(new TextBlock {
+            Text = "Ошибка: WinPcap или Npcap не найден!",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            FontSize = 20
+        });
+
+        // Если окно уже создано билдером:
+        if (MainWindow != null) {
+            MainWindow.Content = visual;
+            MainWindow.Activate();
+        }
     }
 }
