@@ -1,7 +1,6 @@
 using System.Net.NetworkInformation;
 using NetworkParser.Core.Abstractions.Connection;
 using NetworkParser.Core.Abstractions.Parsers;
-using NetworkParser.Core.Parsers;
 using NetworkParser.Domain.Interfaces;
 using NetworkParser.Domain.Packets;
 using PacketDotNet;
