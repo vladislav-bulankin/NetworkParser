@@ -10,8 +10,8 @@ public class PacketListViewModel : INotifyPropertyChanged {
     private readonly INetworkParserController controller;
     private DispatcherQueue dispatcher;
     public event PropertyChangedEventHandler? PropertyChanged;
-    public ObservableCollection<PacketModel> AllPackets { get; } = new();
-    public ObservableCollection<PacketModel> FilteredPackets { get; } = new();
+    public ObservableCollection<PacketModel> AllPackets { get; private set; } = new();
+    public ObservableCollection<PacketModel> FilteredPackets { get; private set; } = new();
     const int MaxPackets = 5000;
     private PacketModel? selectedPacket;
     private Func<PacketModel, bool> currentFilter = _ => true;
@@ -41,11 +41,13 @@ public class PacketListViewModel : INotifyPropertyChanged {
 
     public event Action<PacketModel>? PacketSelected;
     public void Clear () {
-        FilteredPackets.Clear();
-        AllPackets.Clear();
+        FilteredPackets = new();
+        AllPackets = new();
         OnPropertyChanged(nameof(TotalCount));
         OnPropertyChanged(nameof(DisplayedCount));
         OnPropertyChanged(nameof(FilterStatus));
+        OnPropertyChanged(nameof(FilteredPackets));
+        OnPropertyChanged(nameof(AllPackets));
     }
 
     private bool isSearchVisible;
@@ -68,18 +70,15 @@ public class PacketListViewModel : INotifyPropertyChanged {
     private void OnPacketCaptured (PacketModel packet) {
         dispatcher.TryEnqueue(() =>
         {
-            if (AllPackets.Count > MaxPackets) {
-                AllPackets.RemoveAt(0);
-                FilteredPackets.RemoveAt(0);
-            }
+            if (AllPackets.Count > MaxPackets) { Clear(); }
+
             packet.Number = AllPackets.Count + 1;
             AllPackets.Add(packet);
-            if (currentFilter(packet)) {
-                FilteredPackets.Add(packet);
-                OnPropertyChanged(nameof(TotalCount));     
-                OnPropertyChanged(nameof(DisplayedCount));
-                OnPropertyChanged(nameof(FilterStatus));
-            }
+            if (currentFilter(packet)) { FilteredPackets.Add(packet); }
+
+            OnPropertyChanged(nameof(TotalCount));
+            OnPropertyChanged(nameof(DisplayedCount));
+            OnPropertyChanged(nameof(FilterStatus));
         });
     }
 

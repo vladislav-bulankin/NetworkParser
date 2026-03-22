@@ -215,8 +215,28 @@ public class NetworkParserController : INetworkParserController {
                 model.Destination = ip.DestinationAddress.ToString();
 
                 if (ip.PayloadPacket is TcpPacket tcp) {
-                    model.Protocol = "Tcp";
-                    model.Info = BuildTcpInfo(tcp);
+                    model.SourcePort = tcp.SourcePort;      
+                    model.DestinationPort = tcp.DestinationPort; 
+                    if ((tcp.DestinationPort == 443 || tcp.SourcePort == 443) &&
+                            tcp.PayloadData?.Length > 0) {
+                        var sni = tlsParser.ExtractSni(tcp.PayloadData);
+                        if (sni != null) {
+                            model.Protocol = "TLS";
+                            model.Info = $"ClientHello SNI: {sni}";
+                        } else if (tcp.PayloadData[0] == 0x17) {
+                            model.Protocol = "TLS";
+                            model.Info = $"{tcp.SourcePort} → " +
+                                $"{tcp.DestinationPort} [Application Data] len={tcp.PayloadData.Length}";
+                        } else if (tcp.PayloadData[0] == 0x15) {
+                            model.Protocol = "TLS";
+                            model.Info = $"{tcp.SourcePort} → {tcp.DestinationPort} [Alert]";
+                        } else {
+                            model.Info = BuildTcpInfo(tcp);
+                        }
+                    } else {
+                        model.Protocol = "Tcp";
+                        model.Info = BuildTcpInfo(tcp);
+                    }
                 } else if (ip.PayloadPacket is UdpPacket udp) {
                     model.Protocol = "Udp";
                     model.Info = BuildUdpInfo(udp);
