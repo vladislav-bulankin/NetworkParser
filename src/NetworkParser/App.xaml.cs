@@ -42,6 +42,8 @@ public partial class App : Application {
         );
 
         MainWindow = builder.Window;
+        MainWindow.Title = "Black Sniffer 1.0";
+        MainWindow.AppWindow.SetIcon("Assets/AppIcon.ico");
 
 #if DEBUG
         MainWindow.UseStudio();

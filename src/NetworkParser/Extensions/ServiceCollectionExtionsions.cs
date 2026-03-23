@@ -10,6 +10,7 @@ namespace NetworkParser.UI.Extensions;
 internal static class ServiceCollectionExtionsions {
     internal static void InjectAll (this IServiceCollection services) {
         services.AddSingleton<ITlsParser, TlsParser>();
+        services.AddSingleton<IPacketParser, PacketParser>();
         services.AddSingleton<INetworkParserController, NetworkParserController>();
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<PacketListViewModel>();

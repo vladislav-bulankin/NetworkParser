@@ -53,14 +53,16 @@ public class TcpStreamViewModel : INotifyPropertyChanged {
     private static string TryDecodeAsText (byte[] data) {
         // проверяем печатаемые символы
         var printable = data.Count(b => b >= 32 && b < 127 || b == '\n' || b == '\r' || b == '\t');
-        if (printable / (double)data.Length > 0.7)
+        if (printable / (double)data.Length > 0.7) {
             return Encoding.UTF8.GetString(data);
+        }
 
         // иначе hex
         var sb = new StringBuilder();
         for (int i = 0; i < data.Length; i++) {
-            if (i % 16 == 0 && i > 0)
+            if (i % 16 == 0 && i > 0) {
                 sb.AppendLine();
+            }
             sb.Append(data[i].ToString("X2") + " ");
         }
         return sb.ToString();
